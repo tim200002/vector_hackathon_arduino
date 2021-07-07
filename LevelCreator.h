@@ -1,19 +1,11 @@
 #ifndef LevelCreator_h
 #define LevelCreator_h
 
-#include <Adafruit_NeoPixel.h>
-#ifdef __AVR__
- #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
-#endif
-
-#define NUMPIXELS 20
-#define DELAYVAL 500
+#include "LEDController.h"
 
 class LevelCreator {
     public:
-    LevelCreator(int LEDPin): LEDPin(LEDPin){
-      pixels = Adafruit_NeoPixel(NUMPIXELS, LEDPin, NEO_GRB + NEO_KHZ800);
-      pixels.begin(); // INITIALIZE NeoPixel strip object (REQUIRED);
+    LevelCreator(LEDController* ledController): ledController(ledController){
     }
 
     void newFrame(String levelString) {
@@ -23,36 +15,19 @@ class LevelCreator {
 
       valueAtPlayer = levelArray[0];
 
-      drawLed(levelArray, arraySize);
+      ledController -> drawNewFrame(levelArray, arraySize);
     }
 
     int valueAtPlayer = 0;
 
     private:
-    int LEDPin;
-    Adafruit_NeoPixel pixels;
+    LEDController* ledController;
 
     void stringIntoArray(String arrayString, int* resultArray) {
       for(int i = 0; i < arrayString.length(); i++){
         resultArray[i] = arrayString[i] - '0';
       }
-    }
-
-     void drawLed(int* level, int levelSize){
-      pixels.clear();
-      for(int i=0; i<levelSize; i++) { // For each pixel...
-        if(level[i]== 0) {
-            pixels.setPixelColor(i, pixels.Color(0, 150, 0));
-        }else if(level[i] == 1) {
-          pixels.setPixelColor(i, pixels.Color(150, 0, 0));
-        }
-      }
-       pixels.show();   // Send the updated pixel colors to the hardware.
-    }
-
-
-    
-    
+    }   
 };
 
 #endif

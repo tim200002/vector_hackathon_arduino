@@ -3,17 +3,77 @@
 
 #include "Player.h"
 #include "LevelCreator.h"
+#include <MQTT.h>
+
+#define playerId "1"
+#define jumpButton 32
+
+// possible states are Startup, Ready, Running, Stopped
 
 class GameController {
   public:
-    GameController(Player* player,LevelCreator* levelCreator ):player(player), levelCreator(levelCreator) {}
+    GameController(Player* player,LevelCreator* levelCreator, LEDController* ledController, MQTTClient* mqttClient):player(player), levelCreator(levelCreator), ledController(ledController), mqttClient(mqttClient) {
+        pinMode(jumpButton, INPUT_PULLUP);
+      }
 
+    void startupSequence(){
+      ledController -> drawSolidColor(0,0,255);
+    }
+
+    void reset(){
+      ledController -> drawSolidColor(255,255,255);
+      mqttClient->publish("/LED_Invader/ready", playerId);
+      state = "Ready";
+    }
+    void startGame(){
+      state = "Running"; 
+    }
+
+    void stopGame(String looserId){
+        state = "Stopped";
+        if(looserId == playerId) {
+            ledController -> drawSolidColor(255,0,0);
+        }else {
+          ledController -> drawSolidColor(0,255,0);
+        }
+    }
+
+    void newFrame(String frame){
+        if(state == "Ready" || state == "Running"){
+          state = "Running";
+            levelCreator->newFrame(frame);
+            player->newFrame();
+            if(checkCollision()){
+              mqttClient->publish("/LED_Invader/collision", playerId);
+            }
+        }
+    }
+
+    void read(){
+        const bool jumpButtonLevel = digitalRead(jumpButton);
+        if(jumpButtonLevel == LOW) {
+          jumpPressed();
+        }
+    }
+
+    
+  private:
+    String state = "Startup";
+    Player* player;
+    LEDController* ledController;
+    LevelCreator* levelCreator;
+    MQTTClient* mqttClient;
+
+    void jumpPressed(){
+      if(state == "Stopped" || state == "Startup"){
+          reset();
+      }else if(state == "Running"){
+        player->jump();
+      }
+    }
     bool checkCollision() {
       return levelCreator->valueAtPlayer == 1 && player->getMovementState().getLocation() != 1 ;
     }
-  private:
-    Player* player;
-    LevelCreator* levelCreator;
 };
 
 #endif

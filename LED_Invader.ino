@@ -2,21 +2,25 @@
 #include "Player.h"
 #include "LevelCreator.h"
 #include "GameController.h"
+#include "LEDController.h"
 #include <MQTT.h>
 #include <WiFi.h>
 
+WiFiClient net;
+MQTTClient client;
+
+LEDController ledController(27);
 MyServo playerServo(25);
-LevelCreator myLevelCreator(27);
-Player player(&playerServo, 32);
-GameController gameController(&player, &myLevelCreator);
+LevelCreator myLevelCreator(&ledController);
+Player player(&playerServo);
+GameController gameController(&player, &myLevelCreator, &ledController, &client);
 
 
 const char ssid[] = "Haus";            // put your wifi ssid here
 const char pass[] = "MoRaiX1X";        // put your wifi pass here
 const char device[] = "nameyourdevice";        // put your wifi pass here
 
-WiFiClient net;
-MQTTClient client;
+
 
 void connect() {
   Serial.print("checking wifi...");
@@ -34,18 +38,20 @@ void connect() {
   Serial.println("\nconnected!");
 
   client.subscribe("LED_Invader/new_frame");
+  client.subscribe("LED_Invader/loser");
 }
 
 void messageReceived(String &topic, String &payload) {
-  if(topic == "LED_Invader/new_frame")
-    myLevelCreator.newFrame(payload);
-    player.newFrame();
-    Serial.println(gameController.checkCollision());
-    
+  if(topic == "LED_Invader/new_frame"){
+    gameController.newFrame(payload);
+  } else if(topic == "LED_Invader/loser"){
+    gameController.stopGame(payload);
+  } 
 }
 
 void setup() {
   Serial.begin(115200);
+  gameController.startupSequence();
    // start wifi and mqtt
   WiFi.begin(ssid, pass);
   client.begin("vectorhackathon21.cloud.shiftr.io", net);
@@ -56,6 +62,6 @@ void setup() {
 
 void loop() {
   client.loop();
-  player.read();
+  gameController.read();
   playerServo.update();
 }
