@@ -34,6 +34,18 @@ class LEDController {
       }
        pixels.show(); 
     }
+
+    void blinkSolidColor(int red, int green, int blue) {
+      drawSolidColor(red, green, blue);
+      delay(300);
+      pixels.clear();
+      pixels.show();
+      delay(300);
+      drawSolidColor(red, green, blue);
+      delay(300);
+      pixels.clear();
+      pixels.show();
+    }
     
 
     private:

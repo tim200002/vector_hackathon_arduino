@@ -8,7 +8,7 @@
 #define playerId "1"
 #define jumpButton 32
 
-// possible states are Startup, Ready, Running, Stopped
+// possible states are Ready, Running, Stopped
 
 class GameController {
   public:
@@ -17,7 +17,8 @@ class GameController {
       }
 
     void startupSequence(){
-      ledController -> drawSolidColor(0,0,255);
+      ledController -> blinkSolidColor(0,0,255);
+      reset();
     }
 
     void reset(){
@@ -58,14 +59,14 @@ class GameController {
 
     
   private:
-    String state = "Startup";
+    String state = "undefined";
     Player* player;
     LEDController* ledController;
     LevelCreator* levelCreator;
     MQTTClient* mqttClient;
 
     void jumpPressed(){
-      if(state == "Stopped" || state == "Startup"){
+      if(state == "Stopped"){
           reset();
       }else if(state == "Running"){
         player->jump();

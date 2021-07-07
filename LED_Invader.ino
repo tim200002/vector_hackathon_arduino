@@ -51,13 +51,15 @@ void messageReceived(String &topic, String &payload) {
 
 void setup() {
   Serial.begin(115200);
-  gameController.startupSequence();
+   ledController.drawSolidColor(0,0,255);
    // start wifi and mqtt
   WiFi.begin(ssid, pass);
   client.begin("vectorhackathon21.cloud.shiftr.io", net);
   client.onMessage(messageReceived);
-  playerServo.moveSync(90);
   connect();
+  playerServo.moveSync(90);
+  gameController.startupSequence();
+
 }
 
 void loop() {
