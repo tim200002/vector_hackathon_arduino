@@ -23,6 +23,7 @@ class GameController {
 
     void reset(){
       ledController -> drawSolidColor(255,255,255);
+      player->reset();
       mqttClient->publish("/LED_Invader/ready", playerId);
       state = "Ready";
     }
@@ -37,7 +38,6 @@ class GameController {
         }else {
           ledController -> drawSolidColor(0,255,0);
         }
-        player->reset();
     }
 
     void newFrame(String frame){

@@ -6,8 +6,8 @@
 #include <Arduino.h>
 
 MovementState ground(90, 0, nullptr);
-MovementState jump2(180, 1, &ground);
-MovementState jump1(180, 1, &jump2);
+MovementState jump2(0, 1, &ground);
+MovementState jump1(0, 1, &jump2);
 
 
 class Player {
@@ -33,7 +33,7 @@ class Player {
     void reset() {
       currentState = &ground;
       nextState = nullptr;
-      servo->moveSync(ground.getTargetPosition());
+      servo->setPosition(ground.getTargetPosition());
     }
 
     MovementState getMovementState(){
