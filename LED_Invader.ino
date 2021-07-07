@@ -1,11 +1,15 @@
 #include "MyServo.h"
+#include "Player.h"
 #include "LevelCreator.h"
+#include "GameController.h"
 #include <MQTT.h>
 #include <WiFi.h>
 
-const int buttonPin = 32;
-MyServo myServo(25);
+MyServo playerServo(25);
 LevelCreator myLevelCreator(27);
+Player player(&playerServo, 32);
+GameController gameController(&player, &myLevelCreator);
+
 
 const char ssid[] = "Haus";            // put your wifi ssid here
 const char pass[] = "MoRaiX1X";        // put your wifi pass here
@@ -35,30 +39,23 @@ void connect() {
 void messageReceived(String &topic, String &payload) {
   if(topic == "LED_Invader/new_frame")
     myLevelCreator.newFrame(payload);
+    player.newFrame();
+    Serial.println(gameController.checkCollision());
+    
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(buttonPin, INPUT_PULLUP);
    // start wifi and mqtt
   WiFi.begin(ssid, pass);
   client.begin("vectorhackathon21.cloud.shiftr.io", net);
   client.onMessage(messageReceived);
-
+  playerServo.moveSync(90);
   connect();
 }
 
 void loop() {
   client.loop();
-
-  
-  const bool isPressed = digitalRead(buttonPin);
-  if(isPressed){
-     myServo.setPosition(0);
-    }
-  else {
-       myServo.setPosition(180);
-  }
-  myServo.update();
-   
+  player.read();
+  playerServo.update();
 }

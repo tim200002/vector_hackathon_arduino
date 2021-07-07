@@ -8,6 +8,7 @@ class MyServo {
    public:
     MyServo(int pin);
     void setPosition(int position);
+    void moveSync(int position);
     void update();
   private:
     int currentPosition = 0;

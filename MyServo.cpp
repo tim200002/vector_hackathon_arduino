@@ -7,6 +7,7 @@
     }
 
 void MyServo::update(){
+
       if(targetPosition > currentPosition){
            ++currentPosition;
            myServo.write(currentPosition);
@@ -19,4 +20,11 @@ void MyServo::update(){
 void  MyServo::setPosition(int position) {
         targetPosition = position;
         update();
+  }
+
+void  MyServo::moveSync(int position) {
+        targetPosition = position;
+        while(currentPosition != targetPosition) {
+          update();
+        }
   }

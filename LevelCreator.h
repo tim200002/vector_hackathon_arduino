@@ -21,16 +21,12 @@ class LevelCreator {
       int levelArray[arraySize] = {0};
       stringIntoArray(levelString, levelArray);
 
-      drawLed(levelArray, arraySize);
+      valueAtPlayer = levelArray[0];
 
-      for(int i = 0; i < arraySize; i++){
-        Serial.print(levelArray[i]);
-      } 
-      Serial.println();
-      
+      drawLed(levelArray, arraySize);
     }
 
-    
+    int valueAtPlayer = 0;
 
     private:
     int LEDPin;
