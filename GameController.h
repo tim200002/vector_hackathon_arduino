@@ -37,6 +37,7 @@ class GameController {
         }else {
           ledController -> drawSolidColor(0,255,0);
         }
+        player->reset();
     }
 
     void newFrame(String frame){

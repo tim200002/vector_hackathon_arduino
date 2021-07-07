@@ -30,6 +30,12 @@ class Player {
         }
     }
 
+    void reset() {
+      currentState = &ground;
+      nextState = nullptr;
+      servo->moveSync(ground.getTargetPosition());
+    }
+
     MovementState getMovementState(){
       return *currentState;
     }
