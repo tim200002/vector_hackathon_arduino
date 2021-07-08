@@ -35,14 +35,19 @@ class GameController {
       state = "Running"; 
     }
 
-    void stopGame(String looserId){
-        state = "Stopped";
+    void onWinner(String winnerId){
+        if(winnerId == playerId) {
+            state = "Stopped";
+            ledController -> drawSolidColor(0,255,0);
+            soundController->playVictory2();
+        }
+    }
+
+    void onLoser(String looserId){
         if(looserId == playerId) {
+          state = "Stopped";
             ledController -> drawSolidColor(255,0,0);
             soundController->playCollision2();
-        }else {
-          ledController -> drawSolidColor(0,255,0);
-          soundController->playVictory2();
         }
     }
 

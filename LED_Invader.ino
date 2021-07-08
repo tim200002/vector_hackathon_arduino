@@ -41,13 +41,17 @@ void connect() {
 
   client.subscribe("LED_Invader/new_frame");
   client.subscribe("LED_Invader/loser");
+  client.subscribe("LED_Invader/winner");
 }
 
 void messageReceived(String &topic, String &payload) {
   if(topic == "LED_Invader/new_frame"){
     gameController.newFrame(payload);
   } else if(topic == "LED_Invader/loser"){
-    gameController.stopGame(payload);
+    gameController.onLoser(payload);
+  } else if(topic == "LED_Invader/winner"){
+    Serial.println("on winner");
+    gameController.onWinner(payload);
   } 
 }
 
