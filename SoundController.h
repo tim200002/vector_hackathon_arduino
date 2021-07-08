@@ -1,16 +1,12 @@
 #ifndef SoundController_h
 #define SoundController_h
 
-const int channel = 1;
-const int buzzerPin = 19;
-
-#include <ESP32Servo.h>
-
+ const int PWMFreq = 400;
+ const int PWMResolution = 8;
+ 
 class Tone {
   public:
-    Tone(int frequency, int playAt, Tone* next):frequency(frequency), playAt(playAt), next(next){
-       ledcAttachPin(buzzerPin, channel);
-    };
+    Tone(int frequency, int playAt, Tone* next):frequency(frequency), playAt(playAt), next(next){};
     int frequency;
     unsigned long playAt;
     Tone* next;
@@ -18,7 +14,10 @@ class Tone {
 
 class SoundController{
     public:
-      SoundController(){}
+      SoundController(int pin, int channel): pin(pin), channel(channel){
+        ledcSetup(channel, PWMFreq, PWMResolution);
+        ledcAttachPin(pin, channel);
+      }
 
       void playCollision(){
             cleanup();
@@ -74,13 +73,14 @@ class SoundController{
 
       void instantMute(){
          cleanup();
-         noTone(buzzerPin);
+         ledcWriteTone(channel, 0);
       }
 
       void loop(){
           if(nextTone != nullptr){
-            Serial.println("Tone");
+           
             if(millis() > nextTone -> playAt){
+               Serial.println("Tone");
               playTone();
             }
           }
@@ -88,15 +88,15 @@ class SoundController{
 
         
       private:
-
+        int pin;
+        int channel;
         Tone* nextTone = nullptr;
 
        void playTone(){
           if(nextTone -> frequency == 0){
-             noTone(buzzerPin);
+             ledcWriteTone(channel, 0);
           }else {
              ledcWriteTone(channel, nextTone -> frequency);
-             tone(buzzerPin, nextTone -> frequency);
           }
           const Tone* temp = nextTone;
           nextTone = nextTone-> next;

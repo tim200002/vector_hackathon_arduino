@@ -1,32 +1,41 @@
  #include "MyServo.h"
- #include <Arduino.h>
  
- MyServo::MyServo(int pin) {
-      myServo.setPeriodHertz(50);    // standard 50 hz servo
-      myServo.attach(pin, 600, 2400); // attaches the servo on pin 18 to the servo object
+ const int PWMFreq = 50;
+ const int PWMResolution = 8;
+ const int minDutyCyle = 6;
+  const int maxDutyCyle = 32;
+ MyServo::MyServo(int pin, int channel):channel(channel) {
+      ledcSetup(channel, PWMFreq, PWMResolution);
+      ledcAttachPin(pin, channel);
     }
 
 void MyServo::update(){
-      const int maxStepSize = 10; 
+     const int maxStepSize = 10; 
       const int difference = abs(targetPosition - currentPosition);
       const int stepSize = min(maxStepSize, difference);
       if(targetPosition > currentPosition){
            currentPosition += stepSize;
-           myServo.write(currentPosition);
+           move(currentPosition);
       } else if (targetPosition < currentPosition) {
            currentPosition -= stepSize;
-           myServo.write(currentPosition);
+           move(currentPosition);
       }
 }
 
 void  MyServo::setPosition(int position) {
         targetPosition = position;
-        update();
+       update();
   }
 
 void  MyServo::moveSync(int position) {
         targetPosition = position;
+         move(position);
         while(currentPosition != targetPosition) {
-          update();
+         update();
         }
   }
+
+int MyServo::move(int angle){
+    const int dutyCycle = map(angle, 0, 180, minDutyCyle, maxDutyCyle);
+    ledcWrite(channel, dutyCycle);
+}

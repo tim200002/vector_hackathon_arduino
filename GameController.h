@@ -8,7 +8,7 @@
 
 
 
-#define playerId "1"
+#define playerId "2"
 #define jumpButton 32
 
 // possible states are Ready, Running, Stopped

@@ -4,7 +4,6 @@
 #include "GameController.h"
 #include "LEDController.h"
 #include "SoundController.h"
-#include <ESP32Servo.h>
 #include <MQTT.h>
 #include <WiFi.h>
 
@@ -12,10 +11,10 @@ WiFiClient net;
 MQTTClient client;
 
 LEDController ledController(27);
-MyServo playerServo(25);
+MyServo playerServo(25, 0);
 LevelCreator myLevelCreator(&ledController);
 Player player(&playerServo);
-SoundController soundController;
+SoundController soundController(16, 8);
 GameController gameController(&player, &myLevelCreator, &ledController, &client, &soundController);
 
 
@@ -53,10 +52,6 @@ void messageReceived(String &topic, String &payload) {
 }
 
 void setup() {
-  ESP32PWM::allocateTimer(0);
-  ESP32PWM::allocateTimer(1);
-  ESP32PWM::allocateTimer(2);
-  ESP32PWM::allocateTimer(3);
   Serial.begin(115200);
   ledController.drawSolidColor(0,0,255);
    // start wifi and mqtt
