@@ -10,7 +10,7 @@
     }
 
 void MyServo::update(){
-     const int maxStepSize = 10; 
+     const int maxStepSize = 25; 
       const int difference = abs(targetPosition - currentPosition);
       const int stepSize = min(maxStepSize, difference);
       if(targetPosition > currentPosition){
