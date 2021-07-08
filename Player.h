@@ -23,11 +23,13 @@ class Player {
         }
     }
 
-    void jump(){
+    bool jump(){
         if(nextState == nullptr) {
           nextState = &jump1;
           servo->setPosition(nextState->getTargetPosition());
+          return true;
         }
+        return false;
     }
 
     void reset() {

@@ -3,7 +3,10 @@
 
 #include "Player.h"
 #include "LevelCreator.h"
+#include "SoundController.h"
 #include <MQTT.h>
+
+
 
 #define playerId "1"
 #define jumpButton 32
@@ -12,7 +15,7 @@
 
 class GameController {
   public:
-    GameController(Player* player,LevelCreator* levelCreator, LEDController* ledController, MQTTClient* mqttClient):player(player), levelCreator(levelCreator), ledController(ledController), mqttClient(mqttClient) {
+    GameController(Player* player,LevelCreator* levelCreator, LEDController* ledController, MQTTClient* mqttClient, SoundController* soundController):player(player), levelCreator(levelCreator), ledController(ledController), mqttClient(mqttClient),soundController(soundController){
         pinMode(jumpButton, INPUT_PULLUP);
       }
 
@@ -27,6 +30,7 @@ class GameController {
       mqttClient->publish("/LED_Invader/ready", playerId);
       state = "Ready";
     }
+    
     void startGame(){
       state = "Running"; 
     }
@@ -35,8 +39,10 @@ class GameController {
         state = "Stopped";
         if(looserId == playerId) {
             ledController -> drawSolidColor(255,0,0);
+            soundController->playCollision2();
         }else {
           ledController -> drawSolidColor(0,255,0);
+          soundController->playVictory2();
         }
     }
 
@@ -65,12 +71,14 @@ class GameController {
     LEDController* ledController;
     LevelCreator* levelCreator;
     MQTTClient* mqttClient;
+    SoundController* soundController;
 
     void jumpPressed(){
       if(state == "Stopped"){
           reset();
       }else if(state == "Running"){
-        player->jump();
+        if(player->jump())
+          soundController->playJump();
       }
     }
     bool checkCollision() {

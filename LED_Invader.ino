@@ -3,6 +3,8 @@
 #include "LevelCreator.h"
 #include "GameController.h"
 #include "LEDController.h"
+#include "SoundController.h"
+#include <ESP32Servo.h>
 #include <MQTT.h>
 #include <WiFi.h>
 
@@ -13,7 +15,8 @@ LEDController ledController(27);
 MyServo playerServo(25);
 LevelCreator myLevelCreator(&ledController);
 Player player(&playerServo);
-GameController gameController(&player, &myLevelCreator, &ledController, &client);
+SoundController soundController;
+GameController gameController(&player, &myLevelCreator, &ledController, &client, &soundController);
 
 
 const char ssid[] = "Haus";            // put your wifi ssid here
@@ -50,8 +53,12 @@ void messageReceived(String &topic, String &payload) {
 }
 
 void setup() {
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
   Serial.begin(115200);
-   ledController.drawSolidColor(0,0,255);
+  ledController.drawSolidColor(0,0,255);
    // start wifi and mqtt
   WiFi.begin(ssid, pass);
   client.begin("vectorhackathon21.cloud.shiftr.io", net);
@@ -64,6 +71,8 @@ void setup() {
 
 void loop() {
   client.loop();
-  gameController.read();
   playerServo.update();
+  soundController.loop();
+  gameController.read();
+  
 }
