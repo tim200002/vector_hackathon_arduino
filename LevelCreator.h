@@ -3,6 +3,8 @@
 
 #include "LEDController.h"
 
+#define playerPosition 3
+
 class LevelCreator {
     public:
     LevelCreator(LEDController* ledController): ledController(ledController){
@@ -13,7 +15,7 @@ class LevelCreator {
       int levelArray[arraySize] = {0};
       stringIntoArray(levelString, levelArray);
 
-      valueAtPlayer = levelArray[0];
+      valueAtPlayer = levelArray[playerPosition];
 
       ledController -> drawNewFrame(levelArray, arraySize);
     }

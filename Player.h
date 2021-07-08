@@ -6,8 +6,8 @@
 #include <Arduino.h>
 
 MovementState ground(90, 0, nullptr);
-MovementState jump2(0, 1, &ground);
-MovementState jump1(0, 1, &jump2);
+MovementState jump2(45, 1, &ground);
+MovementState jump1(45, 1, &jump2);
 
 
 class Player {

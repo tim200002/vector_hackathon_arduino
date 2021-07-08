@@ -7,12 +7,14 @@
     }
 
 void MyServo::update(){
-
+      const int maxStepSize = 45; 
+      const int difference = abs(targetPosition - currentPosition);
+      const int stepSize = min(maxStepSize, difference);
       if(targetPosition > currentPosition){
-           ++currentPosition;
+           currentPosition += stepSize;
            myServo.write(currentPosition);
       } else if (targetPosition < currentPosition) {
-           --currentPosition;
+           currentPosition -= stepSize;
            myServo.write(currentPosition);
       }
 }
